@@ -1,18 +1,14 @@
-from math import exp,sqrt,log
+
+# conduct import and checks
+from math import exp,log
 from copy import deepcopy as copy
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
-from tqdm import tqdm
-import pdb
+try:
+	from tqdm import tqdm
+	tqdm_enabled=True
+except ImportError:
+	tqdm_enabled=False
 
-def destringify(data):
-	if isinstance(data,dict):
-		for k in data.keys():
-			data[float(k)] = destringify(data[k])
-			data.pop(k)
-		return data
-	return data
-
+# convert a list of points into nested set of dictionaries in order of indices
 def categorize(data,indices):
 	if len(indices)==1:
 		return min([d[indices[0]] for d in data])
@@ -24,6 +20,7 @@ def categorize(data,indices):
 		d[dd] = categorize(d[dd],indices[1:])
 	return d
 
+# convert a nested set of dictionaries into a list of points (reverse of categorize)
 def decategorize(data):
 	if isinstance(data,dict):
 		r = []
@@ -33,6 +30,7 @@ def decategorize(data):
 		return r
 	return [[data]]
 
+# for a nested set of dictionaries d, attempt to get the entery associated with sequential keys
 def getter(d, keys):
 	dd = d
 	for k in keys:
@@ -41,6 +39,10 @@ def getter(d, keys):
 			return dd
 	return dd
 
+# for a set of x-y datapoints, return the datapoint that is the linear interpolation/extrapolation to a yvalue yval.
+#  fails if there are less than two datpoints (obviously) but optionally more than two.
+# eg. interpolate([(2, 1), (4, 2), (8, 0)],3)
+#      = (6, 3)
 def interpolate(dataxy, yval,min_points=2,extrapolation=True,high_ordering=True):
 	if len(dataxy)<min_points:
 		return None
@@ -102,7 +104,10 @@ def interpolate(dataxy, yval,min_points=2,extrapolation=True,high_ordering=True)
 	else:
 		return (p2[0]+p1[0])*1.0/2,yval
 
-
+# takes a list of data points, and for all datapoint linearly interpolates (optionally extrapolates) the values on the 'value_col'th to be the numbers of 'values', 
+# offsetting as nessisary values from source_col.
+# eg. data_interpolate([[0,1,2],[0,2,4],[0,0,8],[3,0,0],[3,1,1]],[3,5,8],1,2)
+#      = [[0, 3, 6], [0, 5, 10], [0, 8, 16], [3, 3, 3], [3, 5, 5], [3, 8, 8]]
 def data_interpolate(data, values, value_col=1,source_col=0,min_points=2,extrapolation=True,high_ordering=True,debug=False,kulling_singles=True):
 	assert len(data)>0
 	assert value_col!=source_col
@@ -114,7 +119,10 @@ def data_interpolate(data, values, value_col=1,source_col=0,min_points=2,extrapo
 	coord_point_insertion_index = 0
 	if debug:
 		print " -segregating data:"
-		iterator = tqdm(data)
+		if tqdm_enabled:
+			iterator = tqdm(data)
+		else:
+			iterator = data
 	else:
 		iterator = data
 	for d in iterator:
@@ -141,7 +149,10 @@ def data_interpolate(data, values, value_col=1,source_col=0,min_points=2,extrapo
 	new_coord_points = []
 	if debug:
 		print " -interpolating segregated data:"
-		iterator = tqdm(coord_points)
+		if tqdm_enabled:
+			iterator = tqdm(coord_points)
+		else:
+			iterator = coord_points
 	else:
 		iterator = coord_points
 	for c in iterator:
@@ -155,7 +166,10 @@ def data_interpolate(data, values, value_col=1,source_col=0,min_points=2,extrapo
 	new_data = []
 	if debug:
 		print " -desegregating data:"
-		iterator = tqdm(enumerate(coord_pairs))
+		if tqdm_enabled:
+			iterator = tqdm(enumerate(coord_pairs))
+		else:
+			iterator = enumerate(coord_pairs)
 	else:
 		iterator = enumerate(coord_pairs)
 	for i,c in iterator:
@@ -171,17 +185,14 @@ def data_interpolate(data, values, value_col=1,source_col=0,min_points=2,extrapo
 				new_data.append(a)
 	return new_data
 
-
+# returns one if denominator is zero
 def protected_div(a,b):
 	if b!=0:
 		return a/b
 	else:
 		return 1
 
-
-def efron(s,t,d,n):
-	return protected_div(d**4/(12*n) + (5-n)*s**2/(n*(n-1)), t**2)
-
+# Maurer and Pontil's entropy bound
 def entropy(s,t,d,n):
 	if s>d/4.0 or s<0:
 		raise Exception
@@ -191,31 +202,7 @@ def entropy(s,t,d,n):
 		return 0.0
 	return min(1.0,exp(protected_div(-(n-1)*t**2, 2*s*d**2)))
 
-def entropy2(s,w,n):
-	if w>2:
-		w=2
-	if w<=0:
-		return float("inf")
-	return sqrt(2*s*log(2/w)/n) + 7*log(2/w)/(3*(n-1))
-
-def entropy3(s,w,n):
-	if w>2:
-		w=2
-	if w<=0:
-		return float("inf")
-	return sqrt(2*s*log(2/w)/n) + log(2/w)*(2/sqrt(n*n-1)+1/(3*n))
-
-def entropy4(s,w,n):
-	if w>2:
-		w=2
-	if w<=0:
-		return float("inf")
-	l = log(2/w)
-	return (sqrt(s+l/(2*(n-1)))+sqrt(l/(2*(n-1))))*sqrt(2*l/n)+l/(3*n)
-
-def hoeffding_0(tox,n):
-	return exp(-2*tox**2*n)
-
+# Hoeffding's famous bound
 def hoeffding_1(sox,tox,n,replacement=0):
 	if sox<0 or tox<0:
 		return float('nan')
@@ -232,7 +219,7 @@ def hoeffding_1(sox,tox,n,replacement=0):
 	bb = bb*e
 	return a**aa*b**bb
 
-
+# a function wrapper that numerically returns its inverts it on the indexed argument
 def invert(f,argument=0,lower_bound=0,upper_bound=100,start_power=1,upper_bound_return=None):
 	def inner(*args):
 		args2 = list(copy(args))
@@ -255,30 +242,13 @@ def invert(f,argument=0,lower_bound=0,upper_bound=100,start_power=1,upper_bound_
 		return x
 	return inner
 
-
-def plot(data,xaxis=None,yaxis=None,zaxis=None):
-	fig = plt.figure()
-	ax = fig.gca(projection='3d')
-	x = [a[0] for a in data]
-	y = [a[1] for a in data]
-	z = [a[2] for a in data]
-	if xaxis is not None:
-		ax.set_xlabel(xaxis)
-	if yaxis is not None:
-		ax.set_ylabel(yaxis)
-	if zaxis is not None:
-		ax.set_zlabel(zaxis)
-	ax.scatter(x, y, z,s=2.7)
-	plt.show()
-
-
-
-
+# conducts a basic rounding
 def r(a):
 	b = 100000
 	a = round(a*b)*1.0/b
 	return a
 
+# an iterator function, that returns a list of 'steps' numbers between start and stop
 def xxxrange(start,stop,steps):
 	assert steps>=0
 	if steps==0:
@@ -288,21 +258,4 @@ def xxxrange(start,stop,steps):
 		a.append( (stop-start)*((i*1.0)/steps) )
 	return a
 
-def xxrange(start, stop, step=1.0, proportional=False):
-	assert step != 0
-	if start==stop:
-		return [start]
-	direction = 1 if stop>start else -1
-	if direction*step<0:
-		step *= -1
-	if proportional:
-		step *= abs(stop-start)
-	a = []
-	i = 0
-	z = start*direction
-	while (z <= stop*direction):
-		a.append(z*direction)
-		i += 1
-		z = (start+i*step)*direction
-	return a
 
