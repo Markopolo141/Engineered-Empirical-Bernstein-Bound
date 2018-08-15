@@ -1,5 +1,6 @@
 import json
 from utils import *
+from math import sqrt
 import sys
 
 print "*computing deviation of variance bound from envelope*"
@@ -23,7 +24,7 @@ for ii in range(lenargv):
 
 	# take the maximum with d
 	print "maximizing"
-	for a in tqdm(data.keys()):
+	for a in data.keys():
 		for b in data[a].keys():
 			data[a][b] = max(data[a][b].values())
 	# reformulate the data from being a nested dictionaries of values to a list of points
@@ -38,10 +39,9 @@ for ii in range(lenargv):
 
 	# raise exception if the envelope below the data
 	for d in data:
-		if d[-1]<0:
+		if d<0:
 			raise Exception("envelope below the data!")
 		datapoints.append(d[-1])
 
 # calculate the median height of the envelope above the data, and the number of datapoints
-from statistics import median
 print "variance envelope: {} above data, datapoints: {}".format(median(datapoints),len(datapoints))

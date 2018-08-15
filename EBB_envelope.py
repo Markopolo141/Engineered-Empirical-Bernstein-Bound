@@ -1,4 +1,5 @@
 import json
+from math import exp, sqrt
 from utils import *
 import sys
 
@@ -21,12 +22,11 @@ for ii in range(lenargv):
 	for a,b,c in data:
 		if b-exp(-((0.25-a)*n)**2)>0.15:
 			# calculate the height of the envelope above the data
-			v = (0.75 - 0.5*b + 0.25/((0.25-a)*n) + 0.05/(b-exp(-((0.25-a)*n)**2)))/sqrt(n)-c
+			v = (0.80 - 0.5*b + 0.25/((0.25-a)*n) + 0.05/(b-exp(-((0.25-a)*n)**2)))/sqrt(n)-c
 			# raise exception if the envelope below the data
 			if v<0:
 				raise Exception("envelope below the data!")
 			datapoints.append(v)
 
 # calculate the median height of the envelope above the data, and the number of datapoints
-from statistics import median
 print "EBB envelope: {} above data, datapoints: {}".format(median(datapoints),len(datapoints))

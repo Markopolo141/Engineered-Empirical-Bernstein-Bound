@@ -8,6 +8,11 @@ try:
 except ImportError:
 	tqdm_enabled=False
 
+# a cheap function to compute the median of a list of data
+def median(data):
+	data = sorted(data)
+	return data[len(data)/2]
+
 # convert a list of points into nested set of dictionaries in order of indices
 def categorize(data,indices):
 	if len(indices)==1:

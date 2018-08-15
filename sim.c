@@ -11,8 +11,8 @@ int ddims;
 //========== SIMULATION PARAMETERS:
 double D=1.0;
 double phi_iterator=0.009999;
-double q_max= 6.0;
-double q_iterator=0.01;
+double q_max= 1.0;
+double q_iterator=0.001;
 double x0_iterator=0.1;
 
 //========== CORE PROCEDURES
