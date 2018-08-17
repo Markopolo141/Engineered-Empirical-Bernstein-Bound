@@ -197,7 +197,7 @@ def protected_div(a,b):
 	else:
 		return 1
 
-# Maurer and Pontil's entropy bound
+# Maurer and Pontil's entropy variance bound
 def entropy(s,t,d,n):
 	if s>d/4.0 or s<0:
 		raise Exception
