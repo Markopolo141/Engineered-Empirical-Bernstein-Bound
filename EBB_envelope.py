@@ -6,6 +6,14 @@ import sys
 print "*computing deviation of EBB bound from envelope*"
 datapoints = []
 
+# define the envelope
+def envelope(a,b,n):
+	return (1.0/(b-exp(-0.1*(n/4.0-n*a)**2))+100/((n/4.0-n*a)**3)-12*b+13+20*a+8000/(n**2))/(20*sqrt(n))
+
+# define envelope bound:
+def bound(a,b,n):
+	return b-exp(-0.1*((0.25-a)*n)**2)>0.05
+
 # for each of the data files inputted
 lenargv = (len(sys.argv)-1)/2
 for ii in range(lenargv):
@@ -20,9 +28,9 @@ for ii in range(lenargv):
 
 	# for each of the data values in range
 	for a,b,c in data:
-		if b-exp(-((0.25-a)*n)**2)>0.15:
+		if bound(a,b,n):
 			# calculate the height of the envelope above the data
-			v = (0.80 - 0.5*b + 0.25/((0.25-a)*n) + 0.05/(b-exp(-((0.25-a)*n)**2)))/sqrt(n)-c
+			v = envelope(a,b,n)-c
 			# raise exception if the envelope below the data
 			if v<0:
 				raise Exception("envelope below the data!")

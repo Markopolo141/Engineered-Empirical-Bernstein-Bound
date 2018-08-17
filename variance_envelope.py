@@ -6,6 +6,10 @@ import sys
 print "*computing deviation of variance bound from envelope*"
 datapoints = []
 
+# define the envelope
+def envelope(a,b,n):
+	return (0.12+0.3*log(1.0/b)+25*b*a*a*(1-4*a)+1.5/n)/sqrt(n)
+
 # for each of the data files inputted
 lenargv = len(sys.argv)-1
 for ii in range(lenargv):
@@ -30,18 +34,24 @@ for ii in range(lenargv):
 	# reformulate the data from being a nested dictionaries of values to a list of points
 	print "decategorzing data"
 	data = decategorize(data)
+	
+	# invert function on the second argument
+	print "inverting data"
+	data = [(a,c,b) for a,b,c in data]
 
 	# trim of the redundant upper bound 1 values
+	print "trimming redundant 1s"
 	data = [d for d in data if d[-1]<1.0]
 	
 	# calculate the height of the envelope above the data
-	data = [((0.09+0.3*log(1.0/b)+25*b*a*a*(1-4*a)+1.5/n)/sqrt(n)-c) for a,b,c in data if b!=0 and c!=0]
+	print "calculating"
+	data = [envelope(a,b,n)-c for a,b,c in data if b>0]
 
 	# raise exception if the envelope below the data
 	for d in data:
 		if d<0:
 			raise Exception("envelope below the data!")
-		datapoints.append(d[-1])
+		datapoints.append(d)
 
 # calculate the median height of the envelope above the data, and the number of datapoints
 print "variance envelope: {} above data, datapoints: {}".format(median(datapoints),len(datapoints))
