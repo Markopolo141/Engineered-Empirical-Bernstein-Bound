@@ -31,8 +31,9 @@
 \pgfplotsset{
     colormap={blackwhite}{[5pt]
         rgb255(0pt)=(255, 255, 0);
-        rgb255(245pt)=(0, 0, 0);
-        rgb255(255pt)=(0, 0, 255);
+        rgb255(85pt)=(0, 0, 0);
+        rgb255(95pt)=(0, 0, 255);
+        rgb255(365pt)=(200, 255, 255);
         rgb255(1000pt)=(200, 255, 255)
     },
 }
@@ -43,7 +44,7 @@
 \begin{frontmatter}
 
 \title{An Engineered Empirical Burnstein Bound}
-\runtitle{An Engineered Empirical Burnstein Bound}
+\runtitle{Engineered Empirical Burnstein Bound}
 
 \begin{aug}
 \author{\fnms{Mark} \snm{Burgess}\corref{}\thanksref{t1}
@@ -58,9 +59,9 @@
 \runauthor{M. Burgess}
 
 \begin{abstract}
-We derive a stronger Empirical Burnstein Bound (EBB) using a combination of Chernoff bounds and probability unions.
+We derive a stronger Empirical Burnstein Bound (EBB) using a combination of probability unions and Chernoff bounds for the mean of samples and mean of sample squares.
 Like other EBBs, our EBB is a concentration inequality for the divergence of the sample mean from the population mean in terms of the sample variance.
-The new EBB is numerically solved and compared against previous work, and also against a bound with perfect information about the variance.
+The new EBB is numerically solved and compared against previous work, And for context it is also compared against a bound with perfect information about the variance.
 The analysis reveals that our technique can shrink existing probability bounds by about a third, and that perfect variance information would reduce it by about a third again.
 \end{abstract}
 
@@ -88,7 +89,7 @@ The analysis reveals that our technique can shrink existing probability bounds b
 Sample statistics are sometimes used to estimate the statistical parameters of the population (eg. mean, variance, etc).
 And different methods of doing this are available depending on the sample statistics provided and the assumptions which are made about the population.
 A recent development is Empirical Burnstein Bounds (EBB)\cite{Maurer50empiricalbernstein,10.1007/978-3-540-75225-7_15} which are probability bounds describing the likely divergence of the sample mean from the mean in terms of the sample variance under assumption that the population data is bounded within an interval of a known width.
-EBBs have been used as a method of giving confidence bounds for the mean, which is a common and important process in many industrial applications.
+EBBs have been used as a method of giving confidence bounds for the mean, which is a common and important process in industrial applications.
 We take inspiration and extend Maurer and Pontil's work \cite{Maurer50empiricalbernstein} as we combine older techniques to develop a new and stronger EBB
 
 \section{Related Work}
@@ -157,7 +158,7 @@ And with lemmas \ref{prob_union} and \ref{variance1} we will create a new EBB.
 
 \section{Derivation}\label{derivation}
 
-Our first probability bound is a Chernoff bound on the sample mean. This bound is not new and was derived by Wassily Hoeffding\footnote{Apparently it is also known as Bennet's inequality\cite{MR1782937}} \cite{hoeffding1} and has subsequently been a subject of discussion and many further developments \cite{hoeffding2,Bentkus08boundsfor,Pinelis2014,zbMATH00812598,MR1782937}.
+Our first probability bound is a Chernoff bound on the sample mean. This bound is not new and was derived by Wassily Hoeffding \cite{hoeffding1} and has subsequently been a subject of discussion and many further developments \cite{hoeffding2,Bentkus08boundsfor,Pinelis2014,zbMATH00812598,MR1782937}.
 
 \begin{theorem}[Hoeffding's inequality]\label{hoeffdings1}
 For a random variable with a mean of zero that is bounded $a\le X\le b$, then the mean $\hat{\mu}$ of $n$ samples is probability bounded. For $t>0$:
@@ -168,9 +169,9 @@ For a random variable with a mean of zero that is bounded $a\le X\le b$, then th
 \begin{proof}
 For $\alpha,\beta,\gamma$ that $\alpha s^2X^2+\beta sX+\gamma\ge \exp(sX)$ for all $a\le X\le b$:\\
 $E\left[\exp(sX)\right] \le \E[\alpha s^2X^2+\beta sX+\gamma] = \alpha s^2\E[X^2]+\gamma = as^2\sigma^2+c$\\
-If $c=\max(sa,sb)$ choosing $\alpha,\beta,\gamma$ to minimize the expression leads\footnote{see Appendix \ref{appendix1}} to:\\
+If $c=\max(sa,sb)$ choosing $\alpha,\beta,\gamma$ to minimize the expression leads to:\\
 $E\left[\exp(sX)\right] \le (s^2\sigma^2\exp(c) + c^2\exp(-s^2\sigma^2/c))/(s^2\sigma^2 + c^2) $\\
-Hence by application of our lemma \ref{chernoff1}:\\
+(See Appendix \ref{appendix1}), Hence by application of our lemma \ref{chernoff1}:\\
 $ \textstyle\p(\hat{\mu}\ge t)\le \left(s^2\sigma^2\exp(c) + c^2\exp(-s^2\sigma^2/c)\right)^n\exp(-nst)(s^2\sigma^2 + c^2)^{-n} $\\
 minimizing with respect to $s$ gives the result.
 \end{proof}
@@ -257,7 +258,7 @@ letting $y=t+w$ and $x=y-w$ gives:\\
 $\p(\hat{\mu}-\mu>h^{-2}(z^{-1}(\hat{\sigma}^2,y-x),x))\le y$
 \end{proof}
 
-The result of this theorem is an EBB - that is a probabilistic bound for the divergence of the sample mean from the mean parametrized by the sample variance. Care must be taken in applying this theorem that all the assumptions hold, the inverses exist, and the domains of the functions are propagated through the analysis\footnote{see notes in Appendix \ref{appendix2}}.
+The result of this theorem is an EBB - that is a probabilistic bound for the divergence of the sample mean from the mean parametrized by the sample variance. Care must be taken in applying this theorem that all the assumptions hold, the inverses exist, and the domains of the functions are propagated through the analysis (see notes in Appendix \ref{appendix2}).
 
 In applying theorem \ref{ebb1} to the results of theorems \ref{variance2} and \ref{hoeffdings1} (letting $h(\sigma^2,t)=H_1^n\left(\sigma^2/b^2,t/b\right)$ and $f(\sigma^2,w)=H_3^n(a,b,w,\sigma^2)$) we typically don't know the values of $a$ and $b$ but instead know the mean is somewhere within a finite interval of width $D=b-a$.
 So after applying theorem \ref{ebb1} we take the worst case values of $a$ and $b$ consistent with a given $D$ and $\sigma^2$, and take the best $x\in[0,y]$ subject to all other bounds.
@@ -280,18 +281,18 @@ And we are done.
 	xticklabel style={/pgf/number format/fixed},
 	yticklabel style={/pgf/number format/fixed},
 	zticklabel style={/pgf/number format/fixed},
-	view={-110}{35},
+	view={-105}{35},
 	%point meta min=-0.3, point meta max=0.3,
-	point meta min=-0.1, point meta max=0.3,
+	point meta min=-0.1, point meta max=1.0,
 	title={Advantage over Entropic bound for n=200},
 	%colorbar horizontal,
 	colorbar,
 	colorbar style={
-        at={(1.07,0.66)},
+        at={(1.07,0.64)},
 		title=Advantage,
 		%ylabel=Z-value,
 		%ytick={-1,-0.75,...,1},
-        height=0.54*\pgfkeysvalueof{/pgfplots/parent axis height},
+        height=0.52*\pgfkeysvalueof{/pgfplots/parent axis height},
 		xticklabel style={
 			text width=2.5em,
 			%align=below,
@@ -314,7 +315,7 @@ And we are done.
 
 \section{Evaluation}\label{evaluation}
 Evaluating this new EBB consisted of numerically solving a minimization over a maximization over inversions of nested function minimizations.
-This process was conducted in C and Python, using techniques of direct parameter searching, coordinate transforming of data points (for inversions) and interpolations as necessary.\footnote{see Appendix \ref{appendix2} for discussion of the details}
+This process was conducted in C and Python, using techniques of direct parameter searching, coordinate transforming of data points for inversions and interpolations as necessary (see Appendix \ref{appendix2} for discussion of the details).
 And through this process we were able to witness that the assumptions necessary for our theorems held true and thus were able evaluate our new EBB.
 
 We began by comparing our variance bound (per theorem \ref{variance2}) against the entropic bound utilized in Maurer and Pontil's work \cite{Maurer50empiricalbernstein}, originally per \cite{MR2245497}:
@@ -330,7 +331,7 @@ $$ \frac{1}{2}>\frac{\sqrt{\hat{\sigma}^2}}{D}+\sqrt{\frac{2\log(2/y)}{n-1}} $$
 Hence we were able to plot the improvement our EBB offers in this domain, as shown in figure \ref{biggraph3}. In this graph a probability 0.5 bound is shown to approximately shrink by at least a third irrespective of $n$.
 More generally we note that our expectations were confirmed as our refinement of their EBB was seen to be tighter across a large range of values.
 
-We also compared the loss in confidence that our EBB gave over a bound which could be achieved with perfect information about the variance. Specifically Hoeffding's inequality\footnote{Hoeffding's inequality per theorem \ref{hoeffdings1} is understood here to be relatively tight.} assuming $\hat{\sigma}^2=\sigma^2$. The decrease of the bounds that perfect variance information would offer over our EBB is plotted in figure \ref{biggraph4}.
+We also compared the loss in confidence that our EBB gave over a bound which could be achieved with perfect information about the variance. Specifically Hoeffding's inequality assuming $\hat{\sigma}^2=\sigma^2$ (here assumed it to be relatively tight). The decrease of the bounds that perfect variance information would offer over our EBB is plotted in figure \ref{biggraph4}.
 From this graph we notice that when the variance is small there is the most potential gain to be made and where uncertainty about the variance is most detrimental, but generally that going from our EBB to perfect variance information shrinks the bounds by about another third.
 
 \begin{figure}[]
@@ -452,7 +453,7 @@ $$\scriptstyle \p\left(\mu - \hat{\mu}>\frac{D}{20\sqrt{n}}\left(\left(y-exp\lef
 \hfill When $\scriptstyle y-\exp\left(\frac{-1}{10}(\frac{n}{4}-n\hat{\sigma}^2)^2\right)>\frac{1}{20}$\\
 
 Over our computed datapoints these envelopes were witnessed to always widen the probability bounds with a median width increase of $0.031858D^2$ across $7823$ datapoints and $0.0063895D$ across $35002$ datapoints respectively.
-These envelopes are supplied only as a loose approximation over the results of this paper and the reader is encouraged to explore the technique and source code\footnote{at: \href{https://github.com/Markopolo141/Engineered-Empirical-Burnstein-Bound}{https://github.com/Markopolo141/Engineered-Empirical-Burnstein-Bound}} if tighter or more accurate expressions are required.
+These envelopes are supplied only as an approximation over the results and the reader is encouraged to explore the technique and source code (see Appendix \ref{appendix2}) if tighter or more accurate expressions are required.
 
 
  
@@ -473,7 +474,7 @@ In various applications EBBs (and other similar bounds) have been used with samp
 \appendix
 
 \section{Parabola Fitting}\label{appendix1}
-For the task\footnote{Here we carry the derivation with the $x$-axis scaling factor $s$ removed for simplicity} of selecting an $\alpha,\beta,\gamma$ as the parameters of a parabola $\alpha x^2+\beta x+\gamma\ge \exp(x)$ for all $c\le x\le d$ which minimizes $z\alpha+\gamma$ for constants $c,d,z$.
+For the task of selecting an $\alpha,\beta,\gamma$ as the parameters of a parabola $\alpha x^2+\beta x+\gamma\ge \exp(x)$ for all $c\le x\le d$ which minimizes $z\alpha+\gamma$ for constants $c,d,z$.
 We witness that any such parabola much tangentially touch the exponential curve at one point (at $x=f<d$) and intersect it at another (at $x=d$), as illustrated in the following figure \ref{fig:graph1}:
 \begin{figure}[h]
 \begin{tikzpicture}
@@ -590,7 +591,7 @@ In this way we have detailed the components of the methodology used to evaluate 
 It is hoped that all of the components should be relatively transparent and simple numerical steps, and that the result of the method should be tunable without systematic bias to increasingly greater accuracy (at the cost of compute time) with parameters: $n_1,n_2,n_3,n_4,n_5$ and $s_\text{max}$.
 
 For further information, the reader is encouraged to download, inspect and experiment with the sourcecode, available at:\\\href{https://github.com/Markopolo141/Engineered-Empirical-Burnstein-Bound}{https://github.com/Markopolo141/Engineered-Empirical-Burnstein-Bound}\\
-The sourcecode consists of a small\footnote{$\sim 150$ lines of C code, and $\sim 250$ lines of Python code} documented package of C and Python code, that was used (and is setup) to compute the results of the paper.
+The sourcecode consists of a small documented package of C and Python code, that was used (and is setup to) compute the results of the paper.
 
 \newpage
 \bibliographystyle{imsart-number}
