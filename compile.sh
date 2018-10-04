@@ -1,5 +1,3 @@
-g++ -O3 -o sim sim.c
-./sim 50 50
 python gen.py data50_50.json 50
 python gen.py data50_50.json 75
 python gen.py data50_50.json 100
