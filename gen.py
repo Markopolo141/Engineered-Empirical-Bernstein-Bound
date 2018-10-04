@@ -13,14 +13,14 @@ except ImportError:
 h = invert(hoeffding_1,argument=1)
 
 # conduct basic data import checks and parse nessisary data
-assert len(sys.argv)==2
+assert len(sys.argv)==3
 print "loading data: {}".format(sys.argv[1])
 with open("{}".format(sys.argv[1]), "r") as f:
 	import_data = json.load(f)
 print "parsing data"
 config = import_data['config']
 D = config['D']
-n = config['n']
+n = int(sys.argv[2])
 ddims = config['ddims']
 dims = config['dims']
 data = import_data['data']
@@ -30,12 +30,12 @@ data = [list(eval(a))+[b] for a,b in data.iteritems()]
 ydims = 100
 
 # take the minimum of our bound and Maurer and Pontil's entropy bound
-print "curbing data"
-data = [(a,b,c,min(d,entropy(a,b,D,n))) for a,b,c,d in data]
+#print "curbing data"
+#data = [(a,b,c,min(d,entropy(a,b,D,n))) for a,b,c,d in data]
 
 # conduct all coordinate swapping to create function z^-1
 print "inverting data"
-data = [(r(a-b),d,c,r(a)) for a,b,c,d in data]
+data = [(r(a-b),pow(d,n),c,r(a)) for a,b,c,d in data]
 
 # interpolate function z^-1 to create evenly spaced values on the second index
 print "interpolating data"
@@ -69,7 +69,7 @@ for s in iterator: #for every value of s
 
 # output data of our new EBB
 print "outputting"
-with open("formatted_{}".format(sys.argv[1]),"w") as f:
+with open("formatted_data{}_{}_{}.json".format(n,dims,ddims),"w") as f:
 	json.dump(results,f)
 print "done :-)"
 

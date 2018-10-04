@@ -2,7 +2,7 @@
 import json
 from utils import *
 
-filename = "data200_50_50"
+filename = "data50_50"
 n=200
 D=1.0
 
@@ -11,7 +11,7 @@ with open("{}.json".format(filename), "r") as f:
 	import_data = json.load(f)
 
 data = import_data['data']
-results = [list(eval(a))+[b] for a,b in data.iteritems()]
+results = [list(eval(a))+[pow(b,n)] for a,b in data.iteritems()]
 print "trimming data"
 results = [(a,b,c,d) for a,b,c,d in results if a<=D*c*(1-c)]
 print "recategorzing data"

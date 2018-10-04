@@ -47,27 +47,18 @@ inline double obj(double s,double y,double q,double xb,double xa,double x0) {
 }
 
 // compute the variance bound, for variance s, offset y, domain width D, domain offset d, and n samples
-double run_f(double s,double y,double D,double d,int n) {
-	double ws = ((n-1)*y+s)*1.0/n;
-	double min_inner_val2 = 1.0;
+double run_f(double s,double y,double D,double d) {	
 	const double tiny = 0.000001;
-	for (double phi=0.0; phi<=1.0+tiny; phi+=phi_iterator) {
-		double min_inner_val = 1.0;
-		for (double q=q_iterator; q<q_max; q+=q_iterator) {
-			double nfzq = numeric_find_zeroq(q,D*(1-d),-d*D);
-			for (double x0=0; x0>=nfzq; x0+=nfzq*x0_iterator-tiny) {
-				double v = obj(s,(1-phi)*ws,q,D*(1-d),-d*D,x0);
-				if (v<min_inner_val)
-					min_inner_val = v;
-			}
+	double min_inner_val = 1.0;
+	for (double q=q_iterator; q<q_max; q+=q_iterator) {
+		double nfzq = numeric_find_zeroq(q,D*(1-d),-d*D);
+		for (double x0=0; x0>=nfzq; x0+=nfzq*x0_iterator-tiny) {
+			double v = obj(s,y,q,D*(1-d),-d*D,x0);
+			if (v<min_inner_val)
+				min_inner_val = v;
 		}
-		min_inner_val = pow(min_inner_val,n);
-		min_inner_val += hoeffding_1(s/((D*(1-d))*(D*(1-d))),sqrt(phi*ws)/(D*(1-d)),n,0.0);
-		min_inner_val += hoeffding_1(s/((d*D)*(d*D)),sqrt(phi*ws)/(d*D),n,0.0);
-		if (min_inner_val<min_inner_val2)
-			min_inner_val2 = min_inner_val;
 	}
-	return min_inner_val2;
+	return min_inner_val;
 }
 
 
