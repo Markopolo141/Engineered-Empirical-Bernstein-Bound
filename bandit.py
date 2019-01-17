@@ -19,6 +19,10 @@ def Audibert_selection(m,v,n,t):
 	vector = [m[i] + sqrt(v[i]*log(3.0/t)/(2*n[i])) + 3*log(3.0/t)/(2*n[i]) for i in range(len(m))]
 	return vector.index(max(vector))
 
+def Maurer_selection(m,v,n,t):
+	vector = [m[i] + sqrt(2*v[i]*log(2.0/t)/(n[i])) + 7*log(2.0/t)/(3*(n[i]-1)) for i in range(len(m))]
+	return vector.index(max(vector))
+
 def Burgess_selection(m,v,n,t):
 	v = [v[i]*n[i]*1.0/(n[i]-1) for i in range(len(m))]
 	vector = []
@@ -71,7 +75,7 @@ def average_regret(N,T,t,TT):
 	a = [random()*3 for i in range(N)]
 	b = [random()*3 for i in range(N)]
 	max_mean = max([a[i]/(a[i]+b[i]) for i in range(N)])
-	return [max_mean-super_test_method(method,N,a,b,T,t,TT) for method in [Random_selection,Hoeffding_selection,Audibert_selection,Burgess_selection]]
+	return [max_mean-super_test_method(method,N,a,b,T,t,TT) for method in [Random_selection,Maurer_selection,Hoeffding_selection,Audibert_selection,Burgess_selection]]
 
 N = 8#randint(5,12)
 T = 250
