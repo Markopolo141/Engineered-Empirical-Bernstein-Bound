@@ -7,13 +7,8 @@ g++ -o sim sim.c
 ./sim 300 50 50
 ./sim 500 50 50
 ./sim 1000 50 50
-python gen.py data50_50_50.json
-python gen.py data75_50_50.json
-python gen.py data100_50_50.json
-python gen.py data150_50_50.json
-python gen.py data200_50_50.json
-python gen.py data300_50_50.json
-python gen.py data500_50_50.json
-python gen.py data1000_50_50.json
+python gen.py z1data50_50_50.json z1data75_50_50.json z1data100_50_50.json z1data150_50_50.json z1data200_50_50.json z1data300_50_50.json z1data500_50_50.json z1data1000_50_50.json
 python graph.py
-python graph2.py formatted_data50_50_50.json 50 formatted_data75_50_50.json 75 formatted_data100_50_50.json 100 formatted_data150_50_50.json 150 formatted_data200_50_50.json 200 formatted_data300_50_50.json 300 formatted_data500_50_50.json 500 formatted_data1000_50_50.json 1000
+python graph2.py 50 75 100 150 200 300 500 1000
+python bandit.py 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240 250 260 270 280 290 300 310 320 330 340 350 360 370 380 390
+python rearrange.py

@@ -16,13 +16,15 @@ double phi_iterator=0.0009999;
 #include "core.c"
 
 //========== DATAS:
-char output_file_name[80];
+char output_file_name1[80];
+char output_file_name2[80];
 
 
 // the main loop - computes all the data and interatively outputs it to a JSON formatted file
 void run() {
+	// for the data regarding the variance bound
 	// open the file and print the JSON header
-	FILE *fp = fopen(output_file_name, "w");
+	FILE *fp = fopen(output_file_name1, "w");
 	fprintf(fp, "{\"config\":{\"n\":%i,\"D\":%f,\"dims\":%i,\"ddims\":%i},\"data\":{\n",n,D,dims,ddims);
 	
 	double s, y, d, v;
@@ -49,6 +51,36 @@ void run() {
 	// print JSON closing braces and close file
 	fprintf(fp, "\n}}");
 	fclose(fp);
+
+	// for computing the z-1 of the EBB itself
+	// open the file and print the JSON header
+	fp = fopen(output_file_name2, "w");
+	fprintf(fp, "{\"config\":{\"n\":%i,\"D\":%f,\"dims\":%i,\"ddims\":%i},\"data\":{\n",n,D,dims,ddims);
+	long file_pos;
+	
+	double a, b;
+	for (int a_int = 0; a_int <= dims; a_int++) { // for all indices of parameter a
+		printf("%.2f%% complete\n",a_int*100.0/dims);
+		for (int b_int = 0; b_int <= dims; b_int++) { // for all indices of parameter b
+			a = a_int * D*D/(4*dims); // calculate the specific values of a and b
+			b = b_int*1.0/dims;
+			for (int dd=0; dd<=ddims; dd++) { // for all indicies of bound offsets d
+				d = dd*D/(2*ddims); // calculate the bound offset d
+				if (D*D*d*(1-d)-a>=0) { // if reasonable
+					v = run_g(a,b,D,d,n); // calculate the z-1 of our EBB
+					if (v!=-1) {
+						fprintf(fp, "\"(%f,%f,%f)\":%0.12f", a,b,d,v); // print it to the JSON file
+						file_pos = ftell(fp);
+						fprintf(fp, ",\n");
+					}
+				}
+			}
+		}
+	}
+	// print JSON closing braces and close file
+	fseek(fp, file_pos, SEEK_SET);
+	fprintf(fp, "\n}}");
+	fclose(fp);
 }
 
 
@@ -66,7 +98,8 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 	printf("Compiling variance bound -- n=%i,dims=%i,ddims=%i \n",n,dims,ddims);
-	sprintf(output_file_name,"data%i_%i_%i.json",n,dims,ddims);
+	sprintf(output_file_name1,"data%i_%i_%i.json",n,dims,ddims);
+	sprintf(output_file_name2,"z1data%i_%i_%i.json",n,dims,ddims);
 	clock_t t;
 	t = clock();
 	run();

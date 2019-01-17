@@ -21,20 +21,22 @@ f2 = open("graph_2.tex","w")
 #shorthand for calculating percent loss from y to x
 l = lambda x,y:(y-x)*100.0/y
 
+#load all data
+filename = "formatted_data.json"
+print "loading data {}".format(filename)
+data = []
+with open("{}".format(filename), "r") as f:
+	data = json.load(f)
+
 # read arguments and load data
-lenargv = (len(sys.argv)-1)/2
+lenargv = len(sys.argv)-1
 for ii in range(lenargv):
-	filename = sys.argv[ii*2+1]
-	n = int(sys.argv[ii*2+2])
-	print "loading data {}".format(filename)
-	data = []
-	with open("{}".format(filename), "r") as f:
-		data = json.load(f)
+	n = int(sys.argv[1+ii])
 	# write datums
 	f1.write("\n{}:\n".format(n))
 	f2.write("\n{}:\n".format(n))
-	f1.write("".join([str((d[0],l(d[2],entropy2(d[0],0.5,n)))) for d in data if (d[1]==0.5) and (0.5>sqrt(d[0])+sqrt(2*log(2.0/0.5)/(n-1)))])+'\n')
-	f2.write("".join([str((d[0],l(h(d[0],0.5,n),d[2]))) for d in data if d[1]==0.5])+'\n')
+	f1.write("".join([str((d[1],l(d[3],entropy2(d[1],0.5,n)))) for d in data if (d[0]==n) and (d[2]==0.5) and (0.5>sqrt(d[1])+sqrt(2*log(2.0/0.5)/(n-1)))])+'\n')
+	f2.write("".join([str((d[1],l(h(d[1],0.5,n),d[3]))) for d in data if (d[0]==n) and (d[2]==0.5)])+'\n')
 
 print "done"
 #close files
