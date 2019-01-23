@@ -12,7 +12,7 @@ def average(a):
 	return sum(a)/len(a)
 
 def Hoeffding_selection(m,v,n,t):
-	vector = [m[i]+sqrt(2*log(1.0/t)/n[i]) for i in range(len(m))]
+	vector = [m[i]+sqrt(log(1.0/t)/(2*n[i])) for i in range(len(m))]
 	return vector.index(max(vector))
 
 def Audibert_selection(m,v,n,t):
