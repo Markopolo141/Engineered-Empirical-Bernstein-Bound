@@ -1,0 +1,179 @@
+
+
+
+
+\documentclass{article}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{tikz}
+\usepackage[a4paper, total={8in, 11in}]{geometry}
+
+
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\p}{\mathbb{P}}
+\DeclareMathOperator{\pr}{\mathbb{P}}
+\newlength{\dhatheight}
+\newcommand{\doublehat}[1]{%
+    \settoheight{\dhatheight}{\ensuremath{\hat{#1}}}%
+    \addtolength{\dhatheight}{-0.15ex}%
+    \hat{\vphantom{\rule{1pt}{\dhatheight}}%
+    \smash{\hat{#1}}}}
+
+
+
+
+
+\begin{document}
+
+After my talk on Thursday, some people asked how to improve Hoeffding's inequality, and how it could be made to give confidence-intervals that do not exceed the data's bounds.
+Hoeffding's inequality is easy to use and can be essential in some formal proofs. But my research has led me to know that there are better bounds. And if my learning is usefull for someone else, then I regard that as a best kind of outcome!\\
+
+The easiest way to show how Hoeffding's inequality can be improved is to show how a better bound can be created by omitting an approximation in its derivation - ie. creating a universally more powerfull bound.\\
+Hoeffding's inequality is an example of a Chernoff bound, which uses Markov's inequality:\\
+
+\begin{lemma}[Markov's Inequality] for any non-negative random variable $X$ and any $a>0$ that: $\p(X\ge a)\le \E[X]/a$ 
+\end{lemma}
+
+
+\begin{lemma}[Chernoff Bound]\label{chernoff1}
+If $\hat{\mu} = \frac{1}{n}\sum_{i=1}^nx_i$ is sample mean of $n$ independent and identically distributed samples of random variable $X$ ($x_i\sim X$), then for any $s,t>0$: $\p(\hat{\mu}\ge t)\le\E\left[\exp(sX)\right]^n\exp(-snt)$
+\end{lemma}
+\begin{proof}
+$\p(\hat{\mu}\ge t) =  \p\left(\exp\left(s\sum_{i=1}^nx_i\right)\ge \exp(snt)\right)$ hence by Markov's inequality $\p(\hat{\mu}\ge t)\le \E\left[\exp\left(s\sum_{i=1}^nx_i\right)\right]\exp(-snt)$\\
+The result follows as we assume that our samples are independant (for any independant variables $A,B$ that $\E[AB]=\E[A]\E[B]$).
+\end{proof}
+%Many phenominally powerfull probability bounds follow by finding upper bounds for $\E\left[\exp(sX)\right]$ - which is also called the moment generating function; including Hoeffing's bound:
+
+
+\begin{theorem}[Hoeffding's inequality for mean zero]\label{hoeffdings_inequality}
+Let $X$ be a random variable that is bounded $a\le X\le b$, with a mean $\mu=0$.  Then letting $D=b-a$, then for any $t>0$, the mean $\hat{\mu}$ of $n$ independent samples of $X$ is bounded:
+$\p(\hat{\mu}\ge t)\le \exp\left(\frac{-2nt^2}{D^2}\right)$
+\end{theorem}
+\begin{proof}
+To prove Hoeffding's inequality we develop an upper bound for $\E[\exp(sX)]$, if we assume variable $X$ has a probability density function $f(x)$, then we can fit a line over $\exp(sx)$ as:
+$\label{Hoeffdings_line_fitting}\E[\exp(sX)] = \int_a^bf(x)\exp(sx)dx \le \int_a^bf(x)(\frac{x-a}{b-a}e^{sb} + \frac{b-x}{b-a}e^{sa})dx$\\
+Using the fact that the mean $\mu = \int_a^bf(x)xdx = 0$ thus:
+$\E[\exp(sX)] \le \frac{1}{sb-sa}\left(sb\exp(sa) - sa\exp(sb) \right)$\\
+Given the fact that for any $\kappa,\gamma$:
+$\frac{1}{\kappa-\gamma}(\kappa\exp(\gamma)-\gamma\exp(\kappa))\le \exp\left(\frac{1}{8}(\kappa-\gamma)^2\right)~~~~~\refstepcounter{equation}(\theequation)\label{Hoeffdings_lemma} $\\
+Thus $\label{hoeffdings_lemma_eq}\E[\exp(sX)] \le \exp\left(\frac{1}{8}s^2(b-a)^2 \right)$
+and by our Chernoff bound (lemma \ref{chernoff1}) we get:
+$ \p(\hat{\mu}\ge t) \le \exp\left(\frac{1}{8}s^2(b-a)^2 n-snt\right) $
+And minimising with respect to $s$ gives the result.
+\end{proof}
+\-\hspace{1cm}\\
+At a first glance, the most limiting feature of this derivation is the requirement that the mean is zero, however this is ultimately immaterial and simplifies the derivation. We just consider our data as if it were shifted to have a mean of zero, leaving $D$ unchanged. hence we get the equation we know and love:\\
+
+\begin{theorem}[Hoeffding's inequality]\label{Hoeffdings_inequality_proper}
+Let $X$ be a real-valued random variable that is bounded $a\le X\le b$.  Then for $D=b-a$ and any $t>0$, the mean $\hat{\mu}$ of $n$ independent samples of $X$ is probability bounded by:\\
+\begin{equation}\p(\hat{\mu}-\mu\ge t)\le \exp\left(-2nt^2/D^2\right)
+\quad\text{Or by rearranging:}\quad
+\p\left(\hat{\mu}-\mu\ge \sqrt{D^2\log(1/t)/(2n)}\right)\le t\end{equation}
+\end{theorem}
+\-\hspace{1cm}\\
+However we can easily do better.\\
+
+\begin{theorem}\label{hoeffdings_inequality22}
+Let $X$ be a real-valued random variable that is bounded $a\le X\le b$, with a mean $\mu$ of zero.  Then for $t>0$, the mean $\hat{\mu}$ of $n$ independent samples of $X$ is probability bounded by:
+\begin{equation}\p(\hat{\mu}\ge t)\le \left( \frac{b}{b-a}\left(\frac{b(a-t)}{a(b-t)}\right)^{\frac{a-t}{b-a}} -\frac{a}{b-a}\left(\frac{b(a-t)}{a(b-t)}\right)^{\frac{b-t}{b-a}}  \right)^n
+\end{equation}
+\end{theorem}
+\begin{proof}
+Exactly the same proof as Theorem \ref{hoeffdings_inequality} except do not use Equation \ref{Hoeffdings_lemma}, leading to:\\
+$ \p(\hat{\mu}\ge t) \le (b\exp(sa) - a\exp(sb))^n\exp(-snt)(b-a)^{-n} $ and minimising with respect to $s$ gives the result.
+%$$ s = \frac{1}{b-a}\log\left(\frac{b(a - t)}{a(b - t)}\right) $$
+\end{proof}
+\-\hspace{1cm}\\
+Now, this concentration inequality is more powerful but more difficult to manipulate, we also dont usually know $a$ or $b$ (since that would correspond to knowing the mean itself). But we usually know that our data is bounded, for instance if we are dealing with binary data then we know that, our variable $X$ (not shifted to have a zero mean) is bounded $0<X<1$, and we directly get:\\
+
+\begin{theorem}[Also called Hoeffding's inequality]\label{hoeffdings_inequality23}
+Let $X$ be a real-valued random variable that is bounded $0\le X\le 1$, with mean $\mu$. Then for $t>0$, the mean $\hat{\mu}$ of $n$ independent samples of $X$ is probability bounded by:
+\begin{equation}\p(\hat{\mu}-\mu\ge t)\le \left[\left(\frac{1-\mu}{1-t-\mu}\right)^{1-t-\mu}  \left(\frac{\mu}{t+\mu}\right)^{t+\mu}\right]^n
+\end{equation}
+\end{theorem}
+\begin{proof}Follows directly from Theorem \ref{hoeffdings_inequality22} with the substitution $a=-\mu$ and $b=1-\mu$.
+\end{proof}
+
+This eqution is also credited to Hoeffding and is found widely in literature.
+So, if you have binary data and your sample mean $\hat{\mu}$ and you want know how likely it is at underestimating the data mean $\mu$ by $t$ then this equation gives this (the equivalent inequality for overestimation is similar)
+
+\pagebreak
+
+So, how much improvement is given by Theorem \ref{hoeffdings_inequality23} over our Hoeffding's inequality Theorem \ref{Hoeffdings_inequality_proper} over what might be achieved perfectly?\\ Consider the following figure:
+\-\hspace{1cm}\\
+
+
+
+\begin{figure}[h]
+\centering
+
+\begin{tikzpicture}[xscale=18.7, yscale=3]
+\draw[->] (-0.1,0) -- (0.3,0) node[anchor=north] {$t$};
+\draw[->] (0,0) -- (0,1.1) node[anchor=east] {};
+\draw[smooth, domain=0:0.3, color=black, line width=0.20mm, samples=100] 
+    plot (\x,{e^(-2*9*(\x*\x))}) node [above] {};
+\draw[smooth, domain=0:0.15, color=red, line width=0.20mm, samples=100] 
+    plot (\x,{((((1-0.85)/(1-\x-0.85))^(1-\x-0.85)) * (((0.85)/(\x+0.85))^(\x+0.85)))^9}) node [right] {};
+
+%\draw[smooth, domain=0:0.85, color=black, line width=0.20mm] 
+%    plot (0,0)(1,1) node [above] {};
+
+\draw [color=blue] plot coordinates {((0, 1.0) (0.01, 0.5858470553103369) (0.02, 0.541116769443986) (0.03, 0.4940266224163914) (0.04, 0.4448836480573838) (0.05, 0.39410018156932936) (0.060000000000000005, 0.34221013038093756) (0.07, 0.2898869021427757) (0.08, 0.23796310401811177) (0.09, 0.1874521323190363) (0.09999999999999999, 0.13957177653389025) (0.10999999999999999, 0.09576996688795385) (0.11999999999999998, 0.057752799775041316) (0.12999999999999998, 0.02751498069314216) (0.13999999999999999, 0.007372829712548668) (0.15, 0.0)
+};
+
+\draw (0.1,-0.1) -- (0.1,0.1);
+\draw	(0.1,-0.25) node{{\scriptsize $0.1$}};
+
+\draw (0.05,-0.1) -- (0.05,0.1);
+\draw	(0.05,-0.25) node{{\scriptsize $0.05$}};
+
+\draw (0.15,-0.1) -- (0.15,1);
+\draw	(0.15,-0.25) node{{\scriptsize $0.15$}};
+
+\draw	(0.0,-0.25) node{{\scriptsize $0$}};
+
+\draw	(-0.01,1) node{{\scriptsize $1$}};
+
+\end{tikzpicture}
+
+\caption{for binary data, if your sample mean is $\hat{\mu}=0.85$, the probability envelopes of Hoeffdings inequality (black) and from Theorem \ref{hoeffdings_inequality23} (red) above a hypothetical minimum (blue) for $n=9$ }
+\label{fig:graph111}
+\end{figure}
+
+And from this figure, we can see that the bound derived from Theorem \ref{hoeffdings_inequality23} as the red line is below the black line corresponding to Hoeffding's inequality (Theorem \ref{Hoeffdings_inequality_proper}).
+The ideal blue bound (or atleast what I currently suspect is ideal (!) - contact me if you might like to do collaboration or something) is as follows:
+
+$$\p(\hat{\mu}-\mu>t)\le\max\left(\left(1+\frac{t}{\hat{\mu}-1}\right)^n,\sum_{m=0}^{\lfloor \hat{\mu}n\rfloor}\binom{n}{m}
+\left(\frac{(\hat{\mu}+t-1)(n-\lfloor \hat{\mu}n \rfloor)}{n(1-\hat{\mu})}\right)^{n-m}
+\left(1-\frac{(\hat{\mu}+t-1)(n-\lfloor \hat{\mu}n \rfloor)}{n(1-\hat{\mu})}\right)^{m}
+\right)$$
+
+Which I anticipate is the result of Optimal Uncertainty Quantification procedure \cite{doi:10.1137/10080782X} - which basically is the process of searching directly for the worst case probability distribution for your random variables constrained by what you know.\\
+
+In anycase, the literature on concentration inequalities is simply vast, and there are lots of improvements to be made, and an array of techniques which can be applied.
+Sticking to the original Hoeffding's inequality is safe for publication purposes - as people understand and know it.
+but there is no reason to stay bound to what we are familiar with.
+
+\section{an additional note}
+So, in deriving (most, but importantly not all) concentration inequalities (such as Hoeffding's) we start with the assumption of distribution parameters and then deduce the likely error of sampling statistics from that. However the way in which we often use these inequalities is in reverse, starting from knowledge of sampling statistics and then making inferences about the distribution parameters.
+And if you are a baysian like I am, you should be very worried... as this is technically invalid use.
+However, I understand that ultimately the same problem is part of statistical hypothesis testing generally.
+
+
+\bibliographystyle{plain}
+%\bibliographystyle{authordate1}
+\bibliography{bib}
+
+
+\end{document}
